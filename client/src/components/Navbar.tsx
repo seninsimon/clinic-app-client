@@ -1,64 +1,29 @@
-// components/Navbar.tsx
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+// src/components/Navbar.tsx
+import React from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
 
 const Navbar: React.FC = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Manage login state
+  const { isLoggedIn, logout } = useAuth();
+  const navigate = useNavigate();
 
   const handleLogout = () => {
-    setIsLoggedIn(false);
-    // Add your logout logic here (e.g., clear tokens, redirect)
+    logout();
+    navigate("/login");
   };
 
   return (
-    <nav className="bg-white shadow-lg">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          {/* Left side - Brand Name */}
-          <div className="flex items-center">
-            <Link to="/" className="text-2xl font-bold text-blue-600">
-              Amazing Care
-            </Link>
-          </div>
-
-          {/* Right side - Navigation Links */}
-          <div className="flex items-center space-x-4">
-            <Link
-              to="/"
-              className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
-            >
-              Home
-            </Link>
-            <Link
-              to="/appointment"
-              className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
-            >
-              Appointment
-            </Link>
-            <Link
-              to="/profile"
-              className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
-            >
-              Profile
-            </Link>
-
-            {isLoggedIn ? (
-              <button
-                onClick={handleLogout}
-                className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
-              >
-                Logout
-              </button>
-            ) : (
-              <Link
-                to="/login"
-                className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
-              >
-                Login
-              </Link>
-            )}
-          </div>
-        </div>
+    <nav className="bg-white shadow-lg p-4 flex justify-between">
+      <Link to="/" className="text-2xl font-bold text-blue-600">Amazing Care</Link>
+      <div className="flex space-x-4 items-center">
+        <Link to="/" className="hover:text-blue-600">Home</Link>
+        <Link to="/appointment" className="hover:text-blue-600">Appointment</Link>
+        <Link to="/profile" className="hover:text-blue-600">Profile</Link>
+        {isLoggedIn ? (
+          <button onClick={handleLogout} className="hover:text-blue-600">Logout</button>
+        ) : (
+          <Link to="/login" className="hover:text-blue-600">Login</Link>
+        )}
       </div>
     </nav>
   );

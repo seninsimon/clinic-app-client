@@ -1,53 +1,61 @@
-// pages/Login.tsx
-import React from 'react';
-import { useForm  } from 'react-hook-form';
-import type { SubmitHandler } from 'react-hook-form';
-import { Link, useNavigate } from 'react-router-dom';
-import Footer from '../../components/Footer';
-import background from "../../assets//background.webp"
-import { login } from '../../services/loginService';
+import React, { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import type { SubmitHandler } from "react-hook-form";
+import { Link, useNavigate } from "react-router-dom";
+import Footer from "../../components/Footer";
+import background from "../../assets/background.webp";
+import { loginservice } from "../../services/loginService";
+import { useAuth } from "../../hooks/useAuth";
+import { GoogleLogin } from "@react-oauth/google";
+import axiosInstance from "../../api/axiosInterceptor";
 
-
-// Define form input types
 interface LoginFormInputs {
   email: string;
   password: string;
 }
 
 const Login: React.FC = () => {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<LoginFormInputs>();
+  const { register, handleSubmit, formState: { errors } } = useForm<LoginFormInputs>();
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
+  const {isAuthenticated} = useAuth()
+  useEffect(()=>
+  {
+    if(isAuthenticated)
+  {
+    navigate("/")
+  }
+  },[navigate])
 
-  const navigate = useNavigate()
-  // Form submission handler
-  const onSubmit: SubmitHandler<LoginFormInputs> = async  (data) => {
-     
+  const onSubmit: SubmitHandler<LoginFormInputs> = async (data) => {
     try {
-        const response = await login(data)
-        console.log(response.data)
-        navigate("/")
-
-    } catch (error : any) {
-
-        if(error.response.data.otpverify === false)
-        {
-            console.log(error.response.data.email)
-           localStorage.setItem("email",error.response.data.email)
-           navigate('/verify-otp')
-        }
-       
+      const response = await loginservice(data);
+      const accessToken = response.data.loginUser.token;
+      login(accessToken);
+      navigate("/");
+    } catch (error: any) {
+      if (error.response?.data?.otpverify === false) {
+        localStorage.setItem("email", error.response.data.email);
+        navigate("/verify-otp");
+      }
     }
-    
+  };
+
+  const handleGoogleSuccess = async (credentialResponse: any) => {
+    const tokenId = credentialResponse.credential;
+    try {
+      const res = await axiosInstance.post("/google-login", { tokenId });
+      const accessToken = res.data.token;
+      login(accessToken);
+      navigate("/");
+    } catch (error) {
+      console.error("Google login error", error);
+    }
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen  flex flex-col"
-    style={{backgroundImage : `url(${background})`}}
-    >
+    <div className="bg-gray-50 min-h-screen flex flex-col" style={{ backgroundImage: `url(${background})` }}>
       <main className="flex-grow">
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="max-w-md mx-auto bg-white p-8 rounded-lg shadow-lg">
@@ -55,7 +63,6 @@ const Login: React.FC = () => {
               Log In to Amazing Care
             </h2>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              {/* Email */}
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                   Email
@@ -63,21 +70,18 @@ const Login: React.FC = () => {
                 <input
                   id="email"
                   type="email"
-                  {...register('email', {
-                    required: 'Email is required',
+                  {...register("email", {
+                    required: "Email is required",
                     pattern: {
                       value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-                      message: 'Invalid email address',
+                      message: "Invalid email address",
                     },
                   })}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
                 />
-                {errors.email && (
-                  <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
-                )}
+                {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>}
               </div>
 
-              {/* Password */}
               <div>
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                   Password
@@ -85,33 +89,34 @@ const Login: React.FC = () => {
                 <input
                   id="password"
                   type="password"
-                  {...register('password', {
-                    required: 'Password is required',
-                    minLength: { value: 8, message: 'Password must be at least 8 characters' },
+                  {...register("password", {
+                    required: "Password is required",
+                    minLength: { value: 8, message: "Password must be at least 8 characters" },
                   })}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
                 />
-                {errors.password && (
-                  <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
-                )}
+                {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>}
               </div>
 
-              {/* Signup Link and Submit Button */}
               <div className="flex justify-between items-center">
-                <Link
-                  to="/signup"
-                  className="text-sm text-blue-600 hover:underline"
-                >
+                <Link to="/signup" className="text-sm text-blue-600 hover:underline">
                   Don't have an account? Sign up
                 </Link>
-                <button
-                  type="submit"
-                  className="bg-blue-600 text-white font-semibold px-4 py-2 rounded-md hover:bg-blue-700 transition"
-                >
+                <button type="submit" className="bg-blue-600 text-white font-semibold px-4 py-2 rounded-md">
                   Log In
                 </button>
               </div>
             </form>
+
+            <div className="my-4 text-center text-sm text-gray-500">or</div>
+
+            {/* Google Login */}
+            <div className="flex justify-center">
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={() => console.log("Google Login Failed")}
+              />
+            </div>
           </div>
         </section>
       </main>

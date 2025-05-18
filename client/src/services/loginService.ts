@@ -6,7 +6,7 @@ interface LoginInput {
 }
 
 
-export const login = async(data : LoginInput)=>
+export const loginservice = async(data : LoginInput)=>
 {
     const response = await axiosInstance.post("/login" , data)
     console.log(response)

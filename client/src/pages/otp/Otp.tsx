@@ -3,18 +3,33 @@ import React, { useState, useEffect, useRef } from "react";
 import Footer from "../../components/Footer";
 import { otpverify, resendOtp } from "../../services/otpService";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
+
+
 
 const OTP_LENGTH = 6;
 const RESEND_TIME = 120; // 2 minutes in seconds
 
 const Otp: React.FC = () => {
+  const navigate = useNavigate()
+  
+
+ const {isAuthenticated} = useAuth()
+  useEffect(()=>
+    {
+      if(isAuthenticated)
+    {
+      navigate("/")
+    }
+    },[navigate])
+
   const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(""));
   const [timer, setTimer] = useState(RESEND_TIME);
   const [canResend, setCanResend] = useState(false);
   const inputsRef = useRef<Array<HTMLInputElement | null>>(
     Array(OTP_LENGTH).fill(null)
   );
-  const navigate = useNavigate();
+
 
   // Timer countdown
   useEffect(() => {
