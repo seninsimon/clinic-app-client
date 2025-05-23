@@ -16,23 +16,30 @@ interface LoginFormInputs {
 
 const Login: React.FC = () => {
   const { register, handleSubmit, formState: { errors } } = useForm<LoginFormInputs>();
-  const { login } = useAuth();
+  const { login , isLoggedIn } = useAuth();
   const navigate = useNavigate();
 
-  const {isAuthenticated} = useAuth()
-  useEffect(()=>
-  {
-    if(isAuthenticated)
-  {
-    navigate("/")
+
+useEffect(() => {
+  if (isLoggedIn) {
+    const storedRole = localStorage.getItem("role");
+
+    if (storedRole === "admin" ) {
+      navigate("/admin/dashboard");
+    } else if (storedRole ==="doctor")  {
+      navigate("/doctor/dashboard");
+    }
   }
-  },[navigate])
+}, [isLoggedIn, navigate]);
 
   const onSubmit: SubmitHandler<LoginFormInputs> = async (data) => {
     try {
       const response = await loginservice(data);
       const accessToken = response.data.loginUser.token;
-      login(accessToken);
+      console.log(response.data.loginUser.data.role)
+      const theRole = response.data.loginUser.data.role
+      localStorage.setItem("role",theRole)
+      login(accessToken , theRole );
       navigate("/");
     } catch (error: any) {
       if (error.response?.data?.otpverify === false) {
@@ -46,8 +53,11 @@ const Login: React.FC = () => {
     const tokenId = credentialResponse.credential;
     try {
       const res = await axiosInstance.post("/google-login", { tokenId });
+      console.log(res.data.googleData.data.role)
+      const theRole : string = res.data.googleData.data.role
+      localStorage.setItem("role",theRole)
       const accessToken = res.data.token;
-      login(accessToken);
+      login(accessToken ,theRole); 
       navigate("/");
     } catch (error) {
       console.error("Google login error", error);

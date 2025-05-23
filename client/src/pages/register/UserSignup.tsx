@@ -60,7 +60,7 @@ const UserSignup: React.FC = () => {
                 Are you a doctor?
               </p>
               <Link
-                to="/doctor-registration"
+                to="/doctor-signup"
                 className="inline-block bg-blue-600 text-white font-semibold px-4 py-2 rounded-md hover:bg-blue-700 transition"
               >
                 Doctor Registration

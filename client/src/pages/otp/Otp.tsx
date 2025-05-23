@@ -14,14 +14,14 @@ const Otp: React.FC = () => {
   const navigate = useNavigate()
   
 
- const {isAuthenticated} = useAuth()
+ const {isLoggedIn} = useAuth()
   useEffect(()=>
     {
-      if(isAuthenticated)
+      if(isLoggedIn)
     {
       navigate("/")
     }
-    },[navigate])
+    },[navigate , isLoggedIn])
 
   const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(""));
   const [timer, setTimer] = useState(RESEND_TIME);
@@ -135,8 +135,8 @@ const handleSubmit = async (e: React.FormEvent) => {
     const response = await otpverify({email , otp :otpValue  });
     console.log("OTP verified:", response.data);
 
-    alert("OTP verified successfully!");
-    navigate("/");
+    alert("user verified , please login again");
+    navigate("/login");
   } catch (err: any) {
     console.error(
       "OTP verification failed:",
