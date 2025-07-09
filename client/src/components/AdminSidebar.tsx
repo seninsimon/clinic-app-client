@@ -7,8 +7,10 @@ const Sidebar = () => {
   const links = [
     { path: '/admin/dashboard', name: 'Dashboard' },
     { path: '/admin/department', name: 'Department Management' },
+    { path: '/admin/doctor-verification', name: 'Doctor Verify' },
     { path: '/admin/doctors', name: 'Doctor Management' },
     { path: '/admin/patients', name: 'Patient Management' },
+    
     
   ];
 

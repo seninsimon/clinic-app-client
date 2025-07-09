@@ -16,14 +16,7 @@ const Navbar: React.FC = () => {
     
   };
 
-  // useEffect(()=>
-  // {
-  //   if(isLoggedIn)
-  //   {
-  //     navigate("/")
-  //   }
 
-  // },[isLoggedIn])
 
 
 

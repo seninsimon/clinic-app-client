@@ -1,30 +1,111 @@
-// src/pages/admin/Department.tsx
-
-import { useFetchDepartment  , useCreateDepartment} from "../../hooks/useDepartment"
-import { useState } from "react"
+import { useState } from "react";
+import toast, { Toaster } from "react-hot-toast";
+import CenteredConfirmationModal from "../../components/common/ConfirmationModal";
+import {
+  useFetchDepartment,
+  useCreateDepartment,
+  useUpdateDepartment,
+  useDeleteDepartment,
+} from "../../hooks/useDepartment";
 
 const Department = () => {
-  const { data: departments, isLoading, isError } = useFetchDepartment()
-  const createDepartment = useCreateDepartment()
+  const { data: departments, isLoading, isError } = useFetchDepartment();
+  const createDepartment = useCreateDepartment();
+  const updateDepartment = useUpdateDepartment();
+  const deleteDepartment = useDeleteDepartment();
 
-  const [showForm, setShowForm] = useState(false)
-  const [formData, setFormData] = useState({ deptName: "", description: "" })
+  const [showForm, setShowForm] = useState(false);
+  const [formData, setFormData] = useState({ deptName: "", description: "" });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value })
-  }
+  const [editId, setEditId] = useState<string | null>(null);
+  const [editFormData, setEditFormData] = useState({
+    deptName: "",
+    description: "",
+  });
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleEditChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setEditFormData({ ...editFormData, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!formData.deptName || !formData.description) return
-   
-    createDepartment.mutate(formData)
-    setFormData({ deptName: "", description: "" })
-    setShowForm(false)
-  }
+    e.preventDefault();
+    if (!formData.deptName || !formData.description) {
+      toast.error("All fields are required.");
+      return;
+    }
+
+    createDepartment.mutate(formData, {
+      onSuccess: () => toast.success("Department created!"),
+      onError: () => toast.error("Failed to create department."),
+    });
+
+    setFormData({ deptName: "", description: "" });
+    setShowForm(false);
+  };
+
+  const startEditing = (dept: any) => {
+    setEditId(dept._id);
+    setEditFormData({
+      deptName: dept.deptName,
+      description: dept.description,
+    });
+  };
+
+  const cancelEdit = () => {
+    setEditId(null);
+    setEditFormData({ deptName: "", description: "" });
+  };
+
+  const handleUpdate = () => {
+    if (!editId) return;
+
+    if (!editFormData.deptName || !editFormData.description) {
+      toast.error("All fields are required.");
+      return;
+    }
+
+    updateDepartment.mutate(
+      { id: editId, ...editFormData },
+      {
+        onSuccess: () => toast.success("Department updated."),
+        onError: () => toast.error("Failed to update department."),
+      }
+    );
+    cancelEdit();
+  };
+
+  const handleDeleteClick = (id: string) => {
+    setDeleteId(id);
+    setIsModalOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (!deleteId) return;
+
+    deleteDepartment.mutate(deleteId, {
+      onSuccess: () => toast.success("Department deleted."),
+      onError: () => toast.error("Failed to delete department."),
+    });
+
+    setIsModalOpen(false);
+    setDeleteId(null);
+  };
 
   return (
     <div className="p-6">
+      <Toaster position="top-right" />
+
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-bold">Department Management</h2>
         <button
@@ -36,7 +117,10 @@ const Department = () => {
       </div>
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="mb-6 p-4 border rounded bg-gray-50 space-y-4">
+        <form
+          onSubmit={handleSubmit}
+          className="mb-6 p-4 border rounded bg-gray-50 space-y-4"
+        >
           <div>
             <label className="block text-sm font-medium">Department Name</label>
             <input
@@ -61,7 +145,10 @@ const Department = () => {
             ></textarea>
           </div>
 
-          <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded">
+          <button
+            type="submit"
+            className="bg-green-600 text-white px-4 py-2 rounded"
+          >
             Create
           </button>
         </form>
@@ -81,20 +168,69 @@ const Department = () => {
             </tr>
           </thead>
           <tbody>
-           
             {departments.map((dept: any, index: number) => (
               <tr key={dept._id}>
-                
                 <td className="p-2 border">{index + 1}</td>
-                <td className="p-2 border">{dept.deptName}</td>
-                <td className="p-2 border">{dept.description}</td>
+
+                <td className="p-2 border">
+                  {editId === dept._id ? (
+                    <input
+                      name="deptName"
+                      value={editFormData.deptName}
+                      onChange={handleEditChange}
+                      className="w-full border px-1 py-0.5 rounded"
+                    />
+                  ) : (
+                    dept.deptName
+                  )}
+                </td>
+
+                <td className="p-2 border">
+                  {editId === dept._id ? (
+                    <textarea
+                      name="description"
+                      value={editFormData.description}
+                      onChange={handleEditChange}
+                      className="w-full border px-1 py-0.5 rounded"
+                      rows={2}
+                    />
+                  ) : (
+                    dept.description
+                  )}
+                </td>
+
                 <td className="p-2 border flex gap-2">
-                  <button className="bg-yellow-500 text-white px-2 py-1 rounded opacity-50 cursor-not-allowed" disabled>
-                    Update
-                  </button>
-                  <button className="bg-red-600 text-white px-2 py-1 rounded opacity-50 cursor-not-allowed" disabled>
-                    Delete
-                  </button>
+                  {editId === dept._id ? (
+                    <>
+                      <button
+                        onClick={handleUpdate}
+                        className="bg-green-600 text-white px-2 py-1 rounded"
+                      >
+                        Save
+                      </button>
+                      <button
+                        onClick={cancelEdit}
+                        className="bg-gray-400 text-white px-2 py-1 rounded"
+                      >
+                        Cancel
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => startEditing(dept)}
+                        className="bg-yellow-500 text-white px-2 py-1 rounded"
+                      >
+                        Update
+                      </button>
+                      <button
+                        onClick={() => handleDeleteClick(dept._id)}
+                        className="bg-red-600 text-white px-2 py-1 rounded"
+                      >
+                        Delete
+                      </button>
+                    </>
+                  )}
                 </td>
               </tr>
             ))}
@@ -103,8 +239,17 @@ const Department = () => {
       ) : (
         !isLoading && <p>No departments found.</p>
       )}
-    </div>
-  )
-}
 
-export default Department
+      {/* 🔒 Confirmation Modal */}
+      <CenteredConfirmationModal
+        isOpen={isModalOpen}
+        title="Confirm Deletion"
+        message="Are you sure you want to delete this department?"
+        onConfirm={confirmDelete}
+        onCancel={() => setIsModalOpen(false)}
+      />
+    </div>
+  );
+};
+
+export default Department;
