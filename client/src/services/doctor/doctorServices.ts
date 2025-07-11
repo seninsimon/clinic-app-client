@@ -32,3 +32,8 @@ export const loginDoctor = async (payload : DoctorLoginPayload) =>
   return response.data
 }
 
+
+export const getDoctorsByDepartment = async (deptId: string) => {
+  const response = await axiosInstance.get(`/user/doctors/department/${deptId}`);
+  return response.data.doctors;
+};

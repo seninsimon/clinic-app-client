@@ -30,6 +30,8 @@ import Bookings from './pages/user/profile/Bookings';
 import Prescriptions from './pages/user/profile/Prescriptions';
 import Chats from './pages/user/profile/Chats';
 import Wallet from './pages/user/profile/Wallet';
+import Services from './pages/user/Services';
+import DepartmentDoctorsPage from './pages/user/DepartmentDoctor';
 
 function App() {
   return (
@@ -48,6 +50,8 @@ function App() {
         <Route path="/verify-otp" element={<Otp />} />
         <Route path="/doctor-signup" element={<DoctorRegister />} />
         <Route path="/doctor-login" element={<DoctorLogin />} />
+        <Route path="/services" element={<Services/>} />
+        <Route path="/department/:id" element={<DepartmentDoctorsPage />} />
 
         {/* USER PROFILE NESTED ROUTES */}
         <Route path="/profile" element={<UserLayout />}>

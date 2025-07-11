@@ -1,5 +1,5 @@
 // src/components/Navbar.tsx
-import React, { useEffect } from "react";
+import React  from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 
@@ -26,6 +26,7 @@ const Navbar: React.FC = () => {
       <Link to="/" className="text-2xl font-bold text-blue-600">Amazing Care</Link>
       <div className="flex space-x-4 items-center">
         <Link to="/" className="hover:text-blue-600">Home</Link>
+        <Link to="/services" className="hover:text-blue-600">services</Link>
        {
         isAdmin ?  <Link to="/admin/dashboard" className="hover:text-blue-600">Admin panel</Link> : ""
        }
