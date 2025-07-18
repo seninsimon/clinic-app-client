@@ -1,6 +1,6 @@
 // src/pages/DepartmentDoctorsPage.tsx
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom"; // ⬅️ import useNavigate
 import { getDoctorsByDepartment } from "../../services/doctor/doctorServices";
 
 interface Doctor {
@@ -16,6 +16,7 @@ interface Doctor {
 
 const DepartmentDoctorsPage: React.FC = () => {
   const { id } = useParams();
+  const navigate = useNavigate(); // ⬅️ initialize navigate
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -39,7 +40,9 @@ const DepartmentDoctorsPage: React.FC = () => {
   return (
     <div className="min-h-screen p-6 bg-gray-50">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-2xl font-bold text-center text-blue-700 mb-6">Doctors in This Department</h1>
+        <h1 className="text-2xl font-bold text-center text-blue-700 mb-6">
+          Doctors in This Department
+        </h1>
 
         {loading && <p className="text-center">Loading...</p>}
         {!loading && doctors.length === 0 && (
@@ -50,7 +53,8 @@ const DepartmentDoctorsPage: React.FC = () => {
           {doctors.map((doc) => (
             <div
               key={doc._id}
-              className="bg-white p-6 rounded-xl shadow hover:shadow-md transition flex flex-col items-center text-center"
+              className="bg-white p-6 rounded-xl shadow hover:shadow-md transition flex flex-col items-center text-center cursor-pointer"
+              onClick={() => navigate(`/doctor/${doc._id}`)} // ⬅️ navigate to doctor detail page
             >
               <img
                 src={doc.profilePicture || "/default-doctor.jpg"}

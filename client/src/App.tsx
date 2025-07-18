@@ -32,6 +32,8 @@ import Chats from './pages/user/profile/Chats';
 import Wallet from './pages/user/profile/Wallet';
 import Services from './pages/user/Services';
 import DepartmentDoctorsPage from './pages/user/DepartmentDoctor';
+import DoctorDetailsPage from './pages/user/DoctorDetails';
+import Profile from './pages/doctor/Profile';
 
 function App() {
   return (
@@ -52,6 +54,7 @@ function App() {
         <Route path="/doctor-login" element={<DoctorLogin />} />
         <Route path="/services" element={<Services/>} />
         <Route path="/department/:id" element={<DepartmentDoctorsPage />} />
+        <Route path="/doctor/:id" element={<DoctorDetailsPage />} />
 
         {/* USER PROFILE NESTED ROUTES */}
         <Route path="/profile" element={<UserLayout />}>
@@ -80,7 +83,7 @@ function App() {
           <Route path="/doctor" element={<DoctorLayout />}>
             <Route index element={<Navigate to="dashboard" />} />
             <Route path="dashboard" element={<DocDashboard />} />
-            <Route path="profile" element={<UpdateDetails />} />
+            <Route path="profile" element={<Profile />} />
             <Route path="appointment" element={<AppointmentSchedule />} />
             <Route path="schedules" element={<Schedules />} />
           </Route>

@@ -21,9 +21,10 @@ const DoctorRegister = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors},
   } = useForm<DoctorForm>();
 
+  console.log(errors)
   const navigate = useNavigate()
 
    const  { isLoggedIn  } = useAuth()
@@ -103,6 +104,7 @@ const DoctorRegister = () => {
 
       await registerDoctor(finalData);
       alert("Doctor Registered Successfully!");
+      navigate("/doctor-login")
     } catch (error) {
       console.error("Registration error", error);
       alert("Failed to register doctor.");
