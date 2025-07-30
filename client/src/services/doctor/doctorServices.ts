@@ -49,9 +49,9 @@ export const bookAppointment = async (payload: {
   date: string;
   start: string;
   end: string;
-  reason?: string 
+  reason?: string;
+  fee: number;
 }) => {
   const response = await axiosInstance.post("/appointments/book", payload);
   return response.data;
 };
-

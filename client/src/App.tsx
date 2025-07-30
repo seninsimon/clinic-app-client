@@ -34,6 +34,7 @@ import Services from './pages/user/Services';
 import DepartmentDoctorsPage from './pages/user/DepartmentDoctor';
 import DoctorDetailsPage from './pages/user/DoctorDetails';
 import Profile from './pages/doctor/Profile';
+import AdminWallet from './pages/admin/AdminWallet';
 
 function App() {
   return (
@@ -55,6 +56,7 @@ function App() {
         <Route path="/services" element={<Services/>} />
         <Route path="/department/:id" element={<DepartmentDoctorsPage />} />
         <Route path="/doctor/:id" element={<DoctorDetailsPage />} />
+        
 
         {/* USER PROFILE NESTED ROUTES */}
         <Route path="/profile" element={<UserLayout />}>
@@ -75,6 +77,7 @@ function App() {
             <Route path="patients" element={<Patients />} />
             <Route path="department" element={<Department />} />
             <Route path="doctor-verification" element={<DoctorVerification />} />
+            <Route path="wallet" element={<AdminWallet />} />
           </Route>
         </Route>
 

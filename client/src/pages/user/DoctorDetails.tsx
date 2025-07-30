@@ -10,6 +10,7 @@ import {
 import { parse, format } from "date-fns";
 import axiosInstance from "../../api/axiosInterceptor";
 import { loadRazorpayScript } from "../../utils/loadRazorpay";
+import toast from "react-hot-toast"; // ✅ Added toast
 
 interface Slot {
   start: string;
@@ -77,13 +78,13 @@ const DoctorDetailsPage: React.FC = () => {
 
   const handleBooking = async () => {
     if (!id || !date || !selectedSlot || !doctor || !reason.trim()) {
-      alert("Please select slot and enter a reason.");
+      toast.error("Please select a slot and enter a reason.");
       return;
     }
 
     const res = await loadRazorpayScript();
     if (!res) {
-      alert("Failed to load Razorpay SDK");
+      toast.error("Failed to load Razorpay SDK");
       return;
     }
 
@@ -95,7 +96,7 @@ const DoctorDetailsPage: React.FC = () => {
       const { id: order_id, amount, currency } = orderResponse.data;
 
       const options = {
-        key: "rzp_test_xsHKluwMQg91bX", 
+        key: "rzp_test_xsHKluwMQg91bX",
         amount,
         currency,
         name: "Online Clinic",
@@ -108,9 +109,10 @@ const DoctorDetailsPage: React.FC = () => {
             start: selectedSlot.start,
             end: selectedSlot.end,
             reason: reason.trim(),
+             fee: doctor.fee,
           });
 
-          alert("✅ Appointment booked!");
+          toast.success("✅ Appointment booked!");
           setSelectedSlot(null);
           setReason("");
           const updated = await getSlotsForDoctorByDate(id, date.toISOString().split("T")[0]);
@@ -128,7 +130,7 @@ const DoctorDetailsPage: React.FC = () => {
       razorpay.open();
     } catch (error) {
       console.error("Payment error:", error);
-      alert("❌ Payment failed");
+      toast.error("❌ Payment failed");
     }
   };
 

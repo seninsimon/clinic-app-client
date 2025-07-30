@@ -10,6 +10,7 @@ const Sidebar = () => {
     { path: '/admin/doctor-verification', name: 'Doctor Verify' },
     { path: '/admin/doctors', name: 'Doctor Management' },
     { path: '/admin/patients', name: 'Patient Management' },
+    { path: '/admin/wallet', name: 'Wallet' }
     
     
   ];

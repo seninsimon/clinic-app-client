@@ -19,6 +19,7 @@
     "date-fns": "^4.1.0",
     "install": "^0.13.0",
     "jwt-decode": "^4.0.0",
+    "mongoose": "^8.16.4",
     "npm": "^11.4.2",
     "razorpay": "^2.9.6",
     "react": "^19.1.0",
