@@ -1,3 +1,4 @@
+// src/pages/Login.tsx
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import type { SubmitHandler } from "react-hook-form";
@@ -21,19 +22,22 @@ const Login: React.FC = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<LoginFormInputs>();
-  const { login, isLoggedIn } = useAuth();
+
+  const { login, isLoggedIn, role } = useAuth();
   const navigate = useNavigate();
 
+  // ✅ Redirect if already logged in
   useEffect(() => {
     if (isLoggedIn) {
-      const storedRole = localStorage.getItem("role");
-      if (storedRole === "admin") {
+      if (role === "admin") {
         navigate("/admin/dashboard");
-      } else if (storedRole === "doctor") {
+      } else if (role === "doctor") {
         navigate("/doctor/dashboard");
+      } else {
+        navigate("/");
       }
     }
-  }, [isLoggedIn, navigate]);
+  }, [isLoggedIn, role, navigate]);
 
   const onSubmit: SubmitHandler<LoginFormInputs> = async (data) => {
     try {
@@ -44,7 +48,6 @@ const Login: React.FC = () => {
       localStorage.setItem("role", theRole);
       login(accessToken);
       navigate("/");
-
     } catch (error: any) {
       const message = error?.response?.data?.message;
 
@@ -78,6 +81,9 @@ const Login: React.FC = () => {
     }
   };
 
+  // ✅ Prevent showing form if already logged in
+  if (isLoggedIn) return null;
+
   return (
     <div
       className="bg-gray-50 min-h-screen flex flex-col"
@@ -104,7 +110,8 @@ const Login: React.FC = () => {
                   {...register("email", {
                     required: "Email is required",
                     pattern: {
-                      value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                      value:
+                        /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
                       message: "Invalid email address",
                     },
                   })}
@@ -190,4 +197,3 @@ const Login: React.FC = () => {
 };
 
 export default Login;
-  
